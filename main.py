@@ -6,6 +6,7 @@ import pandas as pd
 import csv
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
 import pathlib
 import cv2
 from calendar import month
@@ -31,7 +32,10 @@ def sig(x):
 
 
 def initializeWeight(X):
-    return pd.Series(np.random.rand(X))
+    x = [np.random.uniform(0.00001, 10**(-20)) for i in range(X)]
+    # return pd.Series(np.random.rand(X))
+    x = pd.Series(x)
+    return x
 
 def train(c1, c2, f1, f2, epochs, eta, bias, mse_threshold):
     weights = initializeWeight(3)
@@ -47,25 +51,34 @@ def train(c1, c2, f1, f2, epochs, eta, bias, mse_threshold):
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.40, shuffle=True)
     for i in range(epochs):
         square_error = 0
+        train_prediction = []
         for index, row in x_train.iterrows():
             equation = np.dot(weights, row)
+            # tempY = np.dot(weights, row)
             # tempY = round(sig(equation))
             tempY = round(equation)
+            tempY = -1 if tempY < 0 else 1
             # tempY = -1 if tempY == 0 else tempY
             # if y_train[index] != tempY:
+            train_prediction.append(tempY)
             diff = y_train[index] - tempY
             addition = eta * diff * row
             weights = weights.add(addition.tolist())
-            square_error += diff ** 2
-        mse = (1 / x_train.shape[0]) * square_error
-        if mse == mse_threshold:
+            # square_error += diff ** 2
+        # mse = (1 / x_train.shape[0]) * square_error
+        mse = mean_squared_error(y_train, train_prediction)
+        # mse = np.square(np.subtract(y_train, train_prediction)).mean()
+        train_prediction.clear()
+        if mse <= mse_threshold:
+            print('mse threshold break')
             break
     prediction = []
     for index, row in x_test.iterrows():
         # prediction.append(round(sig(np.dot(weights, row))))
         prediction.append(round(np.dot(weights, row)))
 
-    prediction = [-1 if i == 0 else i for i in prediction]
+    # prediction = [-1 if i == 0 else i for i in prediction]
+    prediction = [-1 if i < 0 else 1 for i in prediction]
     print(f'prediction = {prediction}\ny test     = {y_test.tolist()}')
     print(f'r2 accuracy = {r2_score(y_test, prediction)}')
     print(f'accuracy = {accuracy_score(y_test, prediction)}')
@@ -82,22 +95,22 @@ def train(c1, c2, f1, f2, epochs, eta, bias, mse_threshold):
 
     return weights, accuracy_score(y_test, prediction)
 
-def main(class1, class2, feature1, feature2, epochs=100, eta=0.05, bias=0, mse=0.5):
+def main(class1, class2, feature1, feature2, epochs=1000, eta=0.1, bias=0, mse=0.5):
     data = pd.read_csv('penguins.csv')
     i = data['gender'].value_counts()
 
     data['gender'] = data['gender'].replace(['male', 'female', NaN], [0, 1, 0])
     data['gender'] = data['gender'].astype('int')
 
-    c1 = data.iloc[:50, :]
-    c2 = data.iloc[50:100, :]
-    c3 = data.iloc[100:, :]
-    plt.scatter(c1[[feature1]], c1[[feature2]])
-    plt.scatter(c2[[feature1]], c2[[feature2]])
-    plt.scatter(c3[[feature1]], c3[[feature2]])
-    plt.xlabel(feature1)
-    plt.ylabel(feature2)
-    plt.show()
+    # c1 = data.iloc[:50, :]
+    # c2 = data.iloc[50:100, :]
+    # c3 = data.iloc[100:, :]
+    # plt.scatter(c1[[feature1]], c1[[feature2]])
+    # plt.scatter(c2[[feature1]], c2[[feature2]])
+    # plt.scatter(c3[[feature1]], c3[[feature2]])
+    # plt.xlabel(feature1)
+    # plt.ylabel(feature2)
+    # plt.show()
 
     # print(c1)
     # print(c2)
@@ -109,11 +122,12 @@ def main(class1, class2, feature1, feature2, epochs=100, eta=0.05, bias=0, mse=0
     # print(data.loc[data['species'] == 'Chinstrap'])
 
     weights, accuracy = train(data.loc[data['species'] == class1], data.loc[data['species'] == class2], feature1, feature2, epochs, eta, bias, mse)
-    print(f'weights = \n{weights}\naccuracy = {accuracy}')
+    # print(f'weights = \n{weights}\naccuracy = {accuracy}')
     # with open('accuracy.txt', 'a') as f:
     #     f.write(f'classes ({class1}, {class2}), features ({feature1}, {feature2}), accuracy ({accuracy})\n')
-    # return accuracy
+    return weights, accuracy
 
 if __name__ == '__main__':
     w, accuracy = main('Adelie', 'Chinstrap', 'bill_depth_mm', 'bill_length_mm')
-    print(f'accuracy = {accuracy}')
+    # print(f'accuracy = {accuracy}')
+    # print(f'initialized weight = \n{initializeWeight(3)}')
