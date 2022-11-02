@@ -98,7 +98,7 @@ def solve():
         eta =float(eta_var.get())
         bias = Checkbutton1.get()
         mse = float(mse_var.get())
-        accuracy = main(c1, c2, feature1, feature2, epochs, eta, bias, mse)
+        _, accuracy = main(c1, c2, feature1, feature2, epochs, eta, bias, mse)
         showinfo(
             title = 'accuracy',
             message = f'Accuracy of classes {c1}, {c2} by feature {feature1}, {feature2} = {accuracy}' 
