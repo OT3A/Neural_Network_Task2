@@ -109,15 +109,22 @@ def train(c1, c2, f1, f2, epochs, eta, bias, mse_threshold):
     plt.title('Confusion Matrix')
     plt.show()
     
+    xmin = x[f1].min()
+    xmax = x[f1].max()
+    xline = [xmin, xmax]
+    line = []
+    line.append(- (weights[1] * xline[0] + weights[0]) / weights[2] if bias == 1 else - (weights[1] * xline[0]) / weights[2])
+    line.append(- (weights[1] * xline[1] + weights[0]) / weights[2] if bias == 1 else - (weights[1] * xline[1]) / weights[2])
+
     # line = []
     # for _, row in x.iterrows():
     #     line.append(np.array((np.dot(weights, row))))
     # # line = [-1 if i == 0 else i for i in line]
     # xLine = [i for i in range(x.shape[0])]
-    # plt.scatter(c1[[f1]], c1[[f2]])
-    # plt.scatter(c2[[f1]], c2[[f2]])
-    # plt.plot(xLine, line)
-    # plt.show()
+    plt.scatter(c1[[f1]], c1[[f2]])
+    plt.scatter(c2[[f1]], c2[[f2]])
+    plt.plot(xline, line)
+    plt.show()
 
     return weights, accuracy_score(y_test, prediction)
 
@@ -128,15 +135,15 @@ def main(class1, class2, feature1, feature2, epochs=1000, eta=0.1, bias=0, mse=0
     data['gender'] = data['gender'].replace(['male', 'female', NaN], [0, 1, 0])
     data['gender'] = data['gender'].astype('int')
 
-    # c1 = data.iloc[:50, :]
-    # c2 = data.iloc[50:100, :]
-    # c3 = data.iloc[100:, :]
-    # plt.scatter(c1[[feature1]], c1[[feature2]])
-    # plt.scatter(c2[[feature1]], c2[[feature2]])
-    # plt.scatter(c3[[feature1]], c3[[feature2]])
-    # plt.xlabel(feature1)
-    # plt.ylabel(feature2)
-    # plt.show()
+    c1 = data.iloc[:50, :]
+    c2 = data.iloc[50:100, :]
+    c3 = data.iloc[100:, :]
+    plt.scatter(c1[[feature1]], c1[[feature2]])
+    plt.scatter(c2[[feature1]], c2[[feature2]])
+    plt.scatter(c3[[feature1]], c3[[feature2]])
+    plt.xlabel(feature1)
+    plt.ylabel(feature2)
+    plt.show()
 
     # print(c1)
     # print(c2)
