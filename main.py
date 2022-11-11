@@ -85,8 +85,8 @@ def train(c1, c2, f1, f2, epochs, eta, bias, mse_threshold):
             addition = eta * diff * row
             weights = weights.add(addition.tolist())
 
-        mse = mean_squared_error(y_train, train_prediction)
-        # mse = np.square(np.subtract(y_train, train_prediction)).mean()
+        # mse = mean_squared_error(y_train, train_prediction)
+        mse = np.square(np.subtract(y_train, train_prediction)).mean()
         train_prediction.clear()
         if mse <= mse_threshold:
             print('mse threshold break')
