@@ -105,7 +105,7 @@ def train(c1, c2, f1, f2, epochs, eta, bias, mse_threshold):
     
     builtcm = confusion_matrix(y_test, prediction)
     cm = confusionMatrix(y_test, prediction)
-    print(f'confusion_matrix = {builtcm}')
+    print(f'built-in confusion_matrix = {builtcm}')
     print(f'our confusion_matrix = {cm}')
     plt.figure(figsize = (10,8))
     # were 'cmap' is used to set the accent colour
